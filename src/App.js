@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import shuffle from 'lodash.shuffle';
 import './App.css';
 
@@ -17,18 +17,39 @@ const pokemon = [
 const doublePokemon = shuffle([...pokemon, ...pokemon]);
 
 export default function App() {
+  const [opened, setOpened] = useState([]);
+
+  useEffect(() => {
+    if(opened.length === 2) setTimeout(() => setOpened([]), 800);
+  }, [opened]);
+
+  function flipCard(index) {
+    setOpened((opened) => [...opened, index]);
+  }
+
   return <div className="app">
     <div className="cards">
-      {doublePokemon.map((pokemon, index) => (
-        <PokemonCard key={index} pokemon={pokemon} />
-      ))}
+      {doublePokemon.map((pokemon, index) => {
+        let isFlipped = false;
+        if (opened.includes(index)) isFlipped = true;
+
+        return (
+        <PokemonCard 
+          key={index} 
+          index={index}
+          pokemon={pokemon} 
+          isFlipped={isFlipped}
+          flipCard={flipCard}
+          />
+      )})}
     </div>
   </div>;
 }
 
-function PokemonCard({ pokemon }) {
+function PokemonCard({ index, pokemon, isFlipped, flipCard }) {
   return (
-    <div className='pokemon-card flipped'>
+    <button className={`pokemon-card ${isFlipped ? 'flipped' : ''}`}
+       onClick={() => flipCard(index)}>
           <div className="inner">
             <div className="front">
               <img src={`https://pokeres.bastionbot.org/images/pokemon/${pokemon.id}.png`} 
@@ -38,6 +59,6 @@ function PokemonCard({ pokemon }) {
               ?
             </div>
           </div>
-        </div>
+        </button>
   )
 }
