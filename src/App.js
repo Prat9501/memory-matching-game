@@ -18,21 +18,40 @@ const doublePokemon = shuffle([...pokemon, ...pokemon]);
 
 export default function App() {
   const [opened, setOpened] = useState([]);
+  const [matched, setMatched] = useState([]);
+  const [moves, setMoves] = useState(0);
+
+  useEffect(() => {
+    if (opened.length < 2) return;
+
+    const firstPokemon = doublePokemon[opened[0]];
+    const secondPokemon = doublePokemon[opened[1]];
+
+    if (firstPokemon.name === secondPokemon.name)
+      setMatched((matched) => [...matched, firstPokemon.id]);
+
+  }, [opened]);
 
   useEffect(() => {
     if(opened.length === 2) setTimeout(() => setOpened([]), 800);
   }, [opened]);
 
+  useEffect(() => {
+    if (matched.length === pokemon.length) alert('You Won!!!')
+  }, [matched]);
+
   function flipCard(index) {
+    setMoves(moves => moves + 1);
     setOpened((opened) => [...opened, index]);
   }
 
   return <div className="app">
+    <p>{moves}<strong>moves</strong></p>
     <div className="cards">
       {doublePokemon.map((pokemon, index) => {
         let isFlipped = false;
         if (opened.includes(index)) isFlipped = true;
-
+        if (matched.includes(pokemon.id)) isFlipped= true;
         return (
         <PokemonCard 
           key={index} 
